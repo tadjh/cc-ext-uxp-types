@@ -9448,7 +9448,7 @@ declare module "uxp" {
      * @param developerText - Information from the plugin developer to be displayed on the user consent dialog. Message should be localized in current host UI locale.
      * @returns Promise that resolves with "" if succeeded or String containing the error message if failed.
      */
-    openPath(path: string, developerText: string): Promise<string>;
+    openPath(path: string, developerText?: string): Promise<string>;
     /**
      * Opens the url in the dedicated system applications for the scheme.<br/>
      * NOTE: file scheme is not allowed for openExternal. Use openPath for those cases.
@@ -9462,7 +9462,7 @@ declare module "uxp" {
      * @param developerText - Information from the plugin developer to be displayed on the user consent dialog. Message should be localized in current host UI locale.
      * @returns Promise that resolves with "" if succeeded or String containing the error message if failed.
      */
-    openExternal(url: string, developerText: string): Promise<string>;
+    openExternal(url: string, developerText?: string): Promise<string>;
   }
   export const shell: Shell;
 }
