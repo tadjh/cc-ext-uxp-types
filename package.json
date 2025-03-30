@@ -1,21 +1,22 @@
 {
-    "name": "@adobe/cc-ext-uxp-types",
-    "version": "7.3.1",
-    "description": "Typescript definitions for the Adobe UXP JS API",
-    "main": "uxp/index.d.ts",
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/adobe/cc-ext-uxp-types"
-    },
-    "publishConfig": {
-      "access": "public"
-    },
-    "keywords": [
-      "adobe",
-      "uxp",
-      "typescript",
-      "types",
-      "typings"
-    ],
-    "homepage": "https://github.com/adobe/cc-ext-uxp-types#readme"
-  }
+  "name": "@adobe/cc-ext-uxp-types",
+  "version": "8.0.0-tadjh.1",
+  "license": "Apache-2.0",
+  "description": "Typescript definitions for the Adobe UXP JS API",
+  "main": "uxp/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adobe/cc-ext-uxp-types"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "adobe",
+    "uxp",
+    "typescript",
+    "types",
+    "typings"
+  ],
+  "homepage": "https://github.com/adobe/cc-ext-uxp-types#readme"
+}
