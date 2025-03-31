@@ -143,7 +143,7 @@ declare module "uxp" {
      * console.log(folderEntry.isEntry); // isEntry is an API of Entry, in this example it will return true
      * ```
      */
-    class Entry {
+    export class Entry {
       /**
        * Indicates that this instance is an `Entry`. Useful for type-checking.
        * @example
@@ -215,11 +215,11 @@ declare module "uxp" {
        */
       copyTo(
         folder: Folder,
-        options: {
+        options?: {
           overwrite?: boolean;
           allowFolderCopy?: boolean;
         }
-      ): any;
+      ): Promise<File | Folder>;
       /**
        * Moves this entry to the target folder, optionally specifying a new name.
        * @example
@@ -239,11 +239,11 @@ declare module "uxp" {
        */
       moveTo(
         folder: Folder,
-        options: {
+        options?: {
           overwrite?: boolean;
           newName?: string;
         }
-      ): any;
+      ): Promise<void>;
       /**
        * Removes this entry from the file system. If the entry is a folder, it must be empty before deletion.
        * Note: Currently when using this method, a permission denied error will occur if attempting to delete
@@ -252,14 +252,14 @@ declare module "uxp" {
        * await aFile.delete();
        * @returns `Promise<number>` - the number is 0 if succeeded, otherwise throws an Error
        */
-      delete(): any;
+      delete(): Promise<number>;
       /**
        * Returns this entry's metadata.
        * @example
        * const metadata = aFile.getMetadata();
        * @returns `Promise<EntryMetadata>`
        */
-      getMetadata(): any;
+      getMetadata(): Promise<EntryMetadata>;
     }
     /**
      * Metadata for an `Entry`. It includes useful information such as:
@@ -320,7 +320,7 @@ declare module "uxp" {
      * console.log(file.isFile); // returns true
      * ```
      */
-    class File {
+    export class File {
       /**
        * Indicates that this instance is a file.
        * @example
@@ -328,7 +328,7 @@ declare module "uxp" {
        *     await anEntry.read();
        * }
        */
-      isFile: any;
+      isFile: boolean;
       /**
        * Indicates whether this file is read-only or read-write. See [readOnly]{@link ./modes#readonly--symbol} and [readWrite]{@link ./modes#readwrite--symbol}.
        * @example
@@ -348,7 +348,7 @@ declare module "uxp" {
        * @param [options.format = formats.utf8] - The format of the file; see [utf8]{@link ./formats#utf8--symbol} and [binary]{@link ./formats#binary--symbol}.
        * @returns `Promise<string|ArrayBuffer>` the contents of the file
        */
-      read(options: { format?: symbol }): any;
+      read(options?: { format?: symbol }): Promise<string | ArrayBuffer>;
       /**
        * Writes data to a file, appending if desired. The format of the file
        * is controlled via the `format` option, and defaults to UTF8.
@@ -365,18 +365,18 @@ declare module "uxp" {
        */
       write(
         data: string | ArrayBuffer,
-        options: {
+        options?: {
           format?: symbol;
           append?: boolean;
         }
-      ): any;
+      ): Promise<number>;
       /**
        * Determines if the entry is a file or not. This is safe to use even if the
        * entry is `null` or `undefined`.
        * @param entry - the entry to check
        * @returns if `true`, the entry is a file.
        */
-      static isFile(entry: any): boolean;
+      static isFile(entry: File | Entry | null | undefined): boolean;
     }
     /**
      * Provides access to files and folders on a file system. You'll typically not
@@ -385,7 +385,7 @@ declare module "uxp" {
      * @example
      * const fs = uxp.fs.localFileSystem;
      */
-    class FileSystemProvider {
+    export class FileSystemProvider {
       /**
        * Indicates that this is a `FileSystemProvider`. Useful for type-checking.
        */
@@ -425,12 +425,18 @@ declare module "uxp" {
        * @param [options.allowMultiple = false] - if true, multiple files can be selected
        * @returns `Promise<File|Array<File>>` based on `allowMultiple`. Return empty if no file was selected.
        */
-      getFileForOpening(options: {
+      getFileForOpening(options?: {
         initialDomain?: symbol;
         types?: string[];
         initialLocation?: File | Folder;
-        allowMultiple?: boolean;
-      }): any;
+        allowMultiple?: false;
+      }): Promise<File | null>;
+      getFileForOpening(options?: {
+        initialDomain?: symbol;
+        types?: string[];
+        initialLocation?: File | Folder;
+        allowMultiple: true;
+      }): Promise<Array<File> | null>;
       /**
        * Gets a file reference suitable for read-write. Displays a file picker to select a location to "Save" the file.
        *
@@ -454,7 +460,7 @@ declare module "uxp" {
           initialDomain?: symbol;
           types?: string[];
         }
-      ): any;
+      ): Promise<File | null>;
       /**
        * Gets a folder from the file system via a folder picker dialog. The files
        * and folders within can be accessed via [Folder#getEntries]{@link ./Folder#getentries}. Any
@@ -468,7 +474,7 @@ declare module "uxp" {
        * @param [options.initialDomain] - the preferred initial location of the file picker. If not defined, the most recently used domain from a file picker is used instead.
        * @returns `Promise<Folder | null>` - the selected folder or `null` if no folder is selected.
        */
-      getFolder(options: { initialDomain?: symbol }): any;
+      getFolder(options: { initialDomain?: symbol }): Promise<Folder | null>;
       /**
        * Returns a temporary folder. The contents of the folder will be removed when
        * the extension is disposed.
@@ -476,19 +482,19 @@ declare module "uxp" {
        * const temp = await fs.getTemporaryFolder();
        * @returns `Promise<Folder>`
        */
-      getTemporaryFolder(): any;
+      getTemporaryFolder(): Promise<Folder>;
       /**
        * Returns a folder that can be used for extension's data storage without user interaction.
        * It is persistent across host-app version upgrades.
        * @returns `Promise<Folder>`
        */
-      getDataFolder(): any;
+      getDataFolder(): Promise<Folder>;
       /**
        * Returns an plugin's folder – this folder and everything within it are read only.
        * This contains all the Plugin related packaged assets.
        * @returns `Promise<Folder>`
        */
-      getPluginFolder(): any;
+      getPluginFolder(): Promise<Folder>;
       /**
        * Creates an entry for the given url and returns the appropriate instance.
        * @example
@@ -511,7 +517,7 @@ declare module "uxp" {
           type?: symbol;
           overwrite?: boolean;
         }
-      ): any;
+      ): Promise<File | Folder>;
       /**
        * Gets an entry of the given url and returns the appropriate instance.
        * @example
@@ -524,17 +530,17 @@ declare module "uxp" {
        * Note that file: scheme has limited support in UWP due to the strict [File access permissions]{@link https://learn.microsoft.com/en-us/windows/uwp/files/file-access-permissions}
        * @returns `Promise<File|Folder>` the File or Folder object for the given url
        */
-      public getEntryWithUrl(url: string): any;
+      public getEntryWithUrl(url: string): Promise<File | Folder>;
       /**
        * Returns the fs url of given entry.
        * @returns `string`
        */
-      public getFsUrl(entry: Entry): any;
+      public getFsUrl(entry: Entry): string;
       /**
        * Returns the platform native file system path of given entry.
        * @returns `string`
        */
-      public getNativePath(entry: Entry): any;
+      public getNativePath(entry: Entry): string;
       /**
        * Returns a token suitable for use with certain host-specific APIs (such as Photoshop). This token is valid only for the current plugin session. As such, it is of no use if you serialize the token to persistent storage, as the token will be invalid in the future.
        *
@@ -567,7 +573,7 @@ declare module "uxp" {
        * localStorage.setItem("persistent-file", token);
        * @returns `Promise<string>` - the persistent token for the given entry
        */
-      createPersistentToken(entry: Entry): any;
+      createPersistentToken(entry: Entry): Promise<string>;
       /**
        * Returns the file system Entry that corresponds to the persistent token obtained from `createPersistentToken`. If an entry cannot be found that matches the token, then a `Reference Error: token is not defined` error is thrown.
        *
@@ -592,15 +598,16 @@ declare module "uxp" {
        * }
        * @returns `Promise<Entry>` - the corresponding entry for the persistent token
        */
-      getEntryForPersistentToken(token: string): any;
+      getEntryForPersistentToken(token: string): Promise<Entry>;
       /**
        * Checks if the supplied object is a `FileSystemProvider`. It's safe to use even
        * if the object is `null` or `undefined`. Useful for type checking.
        * @param fs - the object to check
        * @returns If `true`, the object is a file system provider
        */
-      static isFileSystemProvider(fs: any): boolean;
+      static isFileSystemProvider(fs: FileSystemProvider): boolean;
     }
+    export const localFileSystem: FileSystemProvider;
     /**
      * Represents a folder on a file system. You'll never instantiate this directly,
      * but will get it by calling [FileSystemProvider.getTemporaryFolder]{@link ./storage#gettemporaryfolder},
@@ -614,11 +621,11 @@ declare module "uxp" {
      * console.log(folder.isFolder); // returns true
      * ```
      */
-    class Folder extends Entry {
+    export class Folder extends Entry {
       /**
        * Indicates that this instance is a folder. Useful for type checking.
        */
-      isFolder: any;
+      isFolder: boolean;
       /**
        * Returns an array of entries contained within this folder.
        * @example
@@ -626,7 +633,7 @@ declare module "uxp" {
        * const allFiles = entries.filter(entry => entry.isFile);
        * @returns `Promise<Array<Entry>>` - The entries within the folder.
        */
-      getEntries(): any;
+      getEntries(): Promise<Array<Entry>>;
       /**
        * Creates an entry within this folder and returns the appropriate instance.
        * @example
@@ -642,11 +649,11 @@ declare module "uxp" {
        */
       createEntry(
         name: string,
-        options: {
+        options?: {
           type?: symbol;
           overwrite?: boolean;
         }
-      ): any;
+      ): Promise<File | Folder>;
       /**
        * Creates a File Entry object within this folder and returns the appropriate instance.
        * Note that this method just create a file entry object and not the actual file on the disk.
@@ -659,10 +666,10 @@ declare module "uxp" {
        */
       createFile(
         name: string,
-        options: {
+        options?: {
           overwrite?: boolean;
         }
-      ): any;
+      ): Promise<File>;
       /**
        * Creates a Folder within this folder and returns the appropriate instance.
        * @example
@@ -670,7 +677,7 @@ declare module "uxp" {
        * @param name - the name of the folder to create.
        * @returns `Promise<Folder>` - the created folder entry object
        */
-      createFolder(name: string): any;
+      createFolder(name: string): Promise<Folder>;
       /**
        * Gets an entry from within this folder and returns the appropriate instance.
        * @example
@@ -678,7 +685,7 @@ declare module "uxp" {
        * @param filePath - the name/path of the entry to fetch
        * @returns `Promise<File | Folder>` the fetched entry.
        */
-      getEntry(filePath: string): any;
+      getEntry(filePath: string): Promise<File | Folder>;
       /**
        * Renames an entry to a new name.
        * @example
@@ -691,15 +698,34 @@ declare module "uxp" {
       renameEntry(
         entry: Entry,
         newName: string,
-        options: {
+        options?: {
           overwrite?: boolean;
         }
-      ): any;
+      ): Promise<void>;
       /**
        * Checks if an entry is a folder. Safe to use if entry might be `null` or
        * `undefined`. Useful for type checking.
        */
-      static isFolder: boolean;
+      static isFolder(entry: Folder | Entry | null | undefined): boolean;
+    }
+
+    // TODO Need examples for the below APIs, not sure if they are instances of Error or not
+    export enum errors {
+      AbstractMethodInvocationError = "AbstractMethodInvocationError",
+      ProviderMismatchError = "ProviderMismatchError",
+      EntryIsNotAnEntryError = "EntryIsNotAnEntryError",
+      EntryIsNotAFolderError = "EntryIsNotAFolderError",
+      EntryIsNotAFileError = "EntryIsNotAFileError",
+      NotAFileSystemError = "NotAFileSystemError",
+      FileNotFoundError = "FileNotFoundError",
+      OutOfSpaceError = "OutOfSpaceError",
+      PermissionDeniedError = "PermissionDeniedError",
+      EntryExistsError = "EntryExistsError",
+      FileIsReadOnlyError = "FileIsReadOnlyError",
+      DomainNotSupportedError = "DomainNotSupportedError",
+      InvalidFileNameError = "InvalidFileNameError",
+      InvalidFileFormatError = "InvalidFileFormatError",
+      DataFileFormatMismatchError = "DataFileFormatMismatchError",
     }
   }
 }
@@ -2155,7 +2181,7 @@ declare class ClassList extends DOMTokenList {
    * Replaces an old token with a new token. If the old token doesn't exist,
    * no action occurs, and `false` is returned.
    */
-  replace(oldToken: any, newToken: any): void;
+  replace(oldToken: any, newToken: any): boolean;
   /**
    * Toggles a token within the list. If `force` is not present, then the following
    * rules are applied:
@@ -8609,7 +8635,7 @@ declare class Plugin {
   /**
    * Get plugin manifest
    */
-  readonly manifest: any;
+  readonly manifest: UXPPluginManifest;
   /**
    * Get plugin enabled/disabled state
    */
@@ -8621,7 +8647,7 @@ declare class Plugin {
    * @param panelId - id of the panel to be shown
    * @returns `Promise<void>|string` Resolves with a void if success else returns a rejection message
    */
-  showPanel(panelId: string): any;
+  showPanel(panelId: string): Promise<void> | string;
   /**
    * Invoke command with given ID. This api may be routed to the host app which can chose to disallow it.
    * Used for commmunicating with other plugins (IPC : Inter Plugin Communication)
@@ -8629,37 +8655,47 @@ declare class Plugin {
    * @param params - arguments to be passed to the command entrypoint as defined in the plugin
    * @returns `Promise<void>`
    */
-  invokeCommand(commandId: string, ...params: any[]): any;
+  invokeCommand(commandId: string, ...params: any[]): Promise<void>;
 }
 /**
  * Thrown whenever a call to `entrypoints.setup` fails or is executed more than once.
  */
 declare class EntryPointsError {}
+
+interface Shortcut {
+  shortcutKey: string;
+  commandKey: boolean;
+  altKey: boolean;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+}
+
 declare class UxpCommandInfo {
   /**
    * Get command id
    */
-  id: any;
+  id: string;
   /**
    * Get command label, localized string
    */
-  label: any;
+  label: string;
   /**
    * Get command description, localized string
    */
-  description: any;
+  description: string;
   /**
    * Get command shortcut
    */
-  shortcut: any;
+  shortcut: Shortcut;
   /**
    * Get isManifestCommand
+   * @returns `true` if the command is a manifest command, `false` otherwise.
    */
-  isManifestCommand: any;
+  isManifestCommand: boolean;
   /**
    * Get command options parameter
    */
-  commandOptions: any;
+  commandOptions: object;
 }
 /**
  * Class describing a single menu item of a panel
@@ -8672,23 +8708,23 @@ declare class UxpMenuItem {
   /**
    * Get menu item label, localized string
    */
-  label: any;
+  label: string;
   /**
-   * Get menu item enable state
+   * Get or Set menu item enable state
    */
-  enabled: any;
+  enabled: boolean;
   /**
-   * Get menu item checked state
+   * Get or Set menu item checked state
    */
-  checked: any;
+  checked: boolean;
   /**
    * Get menu submenu
    */
-  submenu: any;
+  submenu: (UxpMenuItem | string)[];
   /**
    * Get menu parent.
    */
-  parent: any;
+  parent: UxpMenuItems;
   /**
    * Remove the menu item
    */
@@ -8717,12 +8753,244 @@ declare class UxpMenuItems {
    * index > size of menuItems array : throws invalid index exception
    * @param newItem - see 'entrypoints.setup' api for menu item description.
    */
-  insertAt(index: number, newItem: any): void;
+  insertAt(index: number, newItem: UxpMenuItem): void;
   /**
    * Removes menu item from specified index.
    */
   removeAt(index: number): void;
 }
+
+interface PanelSize {
+  width: number;
+  height: number;
+}
+
+/**
+ * UXP Plugin Manifest Interface
+ * Defines the structure of a UXP plugin manifest.json file
+ */
+interface UXPPluginManifest {
+  /**
+   * The manifest version (currently 5)
+   */
+  manifestVersion: number;
+
+  /**
+   * Unique identifier for the plugin
+   */
+  id: string;
+
+  /**
+   * Display name of the plugin
+   */
+  name: string;
+
+  /**
+   * Version of the plugin in semver format
+   */
+  version: string;
+
+  /**
+   * Entry point HTML file for the plugin
+   */
+  main: string;
+
+  /**
+   * Host application requirements
+   */
+  host: {
+    /**
+     * Target application code (PS for Photoshop)
+     */
+    app: "PS" | "XD" | "ID" | string;
+
+    /**
+     * Minimum supported host application version
+     */
+    minVersion: string;
+  };
+
+  /**
+   * Plugin entry points (commands, panels, etc.)
+   */
+  entrypoints: Array<UxpCommandInfo | PanelEntryPoint>;
+
+  /**
+   * Plugin icons definition
+   */
+  icons: Array<IconDefinition>;
+
+  /**
+   * Required permissions for plugin functionality
+   */
+  requiredPermissions: {
+    /**
+     * Network permission configuration
+     */
+    network?: {
+      /**
+       * Allowed domains for network requests
+       */
+      domains: string[];
+    };
+
+    /**
+     * Clipboard access level
+     */
+    clipboard?: "read" | "write" | "readAndWrite";
+
+    /**
+     * Webview configuration
+     */
+    webview?: {
+      /**
+       * Whether webviews are allowed
+       */
+      allow: "yes" | "no";
+
+      /**
+       * Allowed domains for webviews
+       */
+      domains?: string[];
+    };
+
+    /**
+     * Process launching configuration
+     */
+    launchProcess?: {
+      /**
+       * Allowed URL schemes
+       */
+      schemes?: string[];
+
+      /**
+       * Allowed file extensions
+       */
+      extensions?: string[];
+    };
+  };
+}
+
+/**
+ * Command entry point definition
+ */
+interface CommandEntryPoint {
+  /**
+   * Type of entry point
+   */
+  type: "command";
+
+  /**
+   * Unique identifier for this command
+   */
+  id: string;
+
+  /**
+   * Display label for the command
+   */
+  label: {
+    /**
+     * Default label text
+     */
+    default: string;
+
+    /**
+     * Optional localized labels
+     */
+    [locale: string]: string;
+  };
+}
+
+/**
+ * Panel entry point definition
+ */
+interface PanelEntryPoint {
+  /**
+   * Type of entry point
+   */
+  type: "panel";
+
+  /**
+   * Unique identifier for this panel
+   */
+  id: string;
+
+  /**
+   * Display label for the panel
+   */
+  label: {
+    /**
+     * Default label text
+     */
+    default: string;
+
+    /**
+     * Optional localized labels
+     */
+    [locale: string]: string;
+  };
+
+  /**
+   * Minimum panel size
+   */
+  minimumSize: PanelSize;
+
+  /**
+   * Maximum panel size
+   */
+  maximumSize: PanelSize;
+
+  /**
+   * Preferred docked panel size
+   */
+  preferredDockedSize: PanelSize;
+
+  /**
+   * Preferred floating panel size
+   */
+  preferredFloatingSize: PanelSize;
+
+  /**
+   * Panel icons definition
+   */
+  icons: IconDefinition[];
+}
+
+/**
+ * Icon definition
+ */
+interface IconDefinition {
+  /**
+   * Width of the icon in pixels
+   */
+  width: number;
+
+  /**
+   * Height of the icon in pixels
+   */
+  height: number;
+
+  /**
+   * Path to the icon file
+   */
+  path: string;
+
+  /**
+   * Scale factors (1x, 2x)
+   */
+  scale: number[];
+
+  /**
+   * Themes where this icon should be used
+   */
+  theme: Array<"darkest" | "dark" | "medium" | "light" | "lightest">;
+
+  /**
+   * Optional species classification
+   */
+  species?: Array<"generic" | string>;
+}
+
 /**
  * Class describing a panel of the plugin.
  */
@@ -8742,7 +9010,7 @@ declare class UxpPanelInfo {
   /**
    * Get panel shortcut
    */
-  readonly shortcut: any;
+  readonly shortcut: Shortcut;
   /**
    * Get panel title, localized string
    */
@@ -8750,23 +9018,23 @@ declare class UxpPanelInfo {
   /**
    * Get panel icons
    */
-  readonly icons: any;
+  readonly icons: IconDefinition[];
   /**
    * Get panel minimum size
    */
-  readonly minimumSize: any;
+  readonly minimumSize: PanelSize;
   /**
    * Get panel maximum size
    */
-  readonly maximumSize: any;
+  readonly maximumSize: PanelSize;
   /**
    * Get panel preferred docked size
    */
-  readonly preferredDockedSize: any;
+  readonly preferredDockedSize: PanelSize;
   /**
    * Get panel preferred floating size
    */
-  readonly preferredFloatingSize: any;
+  readonly preferredFloatingSize: PanelSize;
   /**
    * Get panel menu items
    */
@@ -8776,19 +9044,19 @@ declare class UxpPluginInfo {
   /**
    * Get plugin id
    */
-  id: any;
+  id: string;
   /**
    * Get plugin version
    */
-  version: any;
+  version: string;
   /**
    * Get plugin name
    */
-  name: any;
+  name: string;
   /**
    * Get plugin manifest
    */
-  manifest: any;
+  manifest: UXPPluginManifest;
   /**
    * Check if the plugin is First Party Plugin
    */
@@ -9083,7 +9351,33 @@ declare var localStorage: LocalStorage;
 declare var sessionStorage: SessionStorage;
 declare var path: Path;
 declare var document: Document;
+
 declare module "fs" {
+  type Encoding = "utf-8" | "utf-16be" | "utf-16le";
+
+  interface Stats {
+    dev: number;
+    ino: number;
+    mode: number;
+    nlink: number;
+    uid: number;
+    gid: number;
+    rdev: number;
+    size: number;
+    blksize: number;
+    blocks: number;
+    atimeMs: number;
+    mtimeMs: number;
+    ctimeMs: number;
+    birthtimeMs: number;
+    atime: string;
+    mtime: string;
+    ctime: string;
+    birthtime: string;
+  }
+
+  type FileDescriptor = number;
+
   /**
    * UXP Provides Node.js style file system API, FSAPI.
    * Unlike [Entry]{@link ./uxp/Persistent%20File%20Storage/Entry/} based [File]{@link ./uxp/Persistent%20File%20Storage/File/} or [Folder]{@link ./uxp/Persistent%20File%20Storage/Folder/} classes,
@@ -9110,15 +9404,21 @@ declare module "fs" {
      * @param path - path where the file to read is located
      * @param [options.encoding] - the encoding of the file can be "utf-8", "utf-16be" or "utf-16le"
      * @param callback - if not provided, this function will return Promise object
-     * @returns `Promise<string|ArrayBuffer>` - the contents of the file
+     * @returns `Promise<string | ArrayBuffer>` - the contents of the file
      */
     readFile(
       path: string,
+      options?: {
+        encoding?: Encoding;
+      }
+    ): Promise<string | ArrayBuffer>;
+    readFile(
+      path: string,
       options: {
-        encoding?: string;
+        encoding?: Encoding;
       },
-      callback: (...params: any[]) => any
-    ): any;
+      callback: (file: string | ArrayBuffer) => void
+    ): void;
     /**
      * Reads data from the path synchronously.
      * The file format can be specified with the encoding options.
@@ -9129,12 +9429,12 @@ declare module "fs" {
      * const text = fs.readFileSync("plugin-data:/textFile.txt", {encoding: "utf-8"});
      * @param path - path where the file to read is located
      * @param [options.encoding] - the encoding of the file can be "utf-8", "utf-16be" or "utf-16le"
-     * @returns the contents of the file
+     * @returns `string | ArrayBuffer` - the contents of the file
      */
     readFileSync(
       path: string,
       options: {
-        encoding?: string;
+        encoding?: Encoding;
       }
     ): string | ArrayBuffer;
     /**
@@ -9155,13 +9455,22 @@ declare module "fs" {
     writeFile(
       path: string,
       data: string | ArrayBuffer | ArrayBufferView,
-      options: {
+      options?: {
         flag?: number | string;
         mode?: number | string;
-        encoding?: string;
+        encoding?: Encoding;
+      }
+    ): Promise<number>;
+    writeFile(
+      path: string,
+      data: string | ArrayBuffer | ArrayBufferView,
+      options?: {
+        flag?: number | string;
+        mode?: number | string;
+        encoding?: Encoding;
       },
-      callback: (...params: any[]) => any
-    ): any;
+      callback: (length: number) => void
+    ): void;
     /**
      * Writes data to a path synchronously, appending if desired.
      * The format of the file is controlled via the encoding option, and defaults to a binary format.
@@ -9179,7 +9488,7 @@ declare module "fs" {
     writeFileSync(
       path: string,
       data: string | ArrayBuffer | ArrayBufferView,
-      options: {
+      options?: {
         flag?: number | string;
         mode?: number | string;
         encoding?: string;
@@ -9198,9 +9507,14 @@ declare module "fs" {
     open(
       path: string,
       flag?: number | string,
-      mode?: number | string,
-      callback?: (...params: any[]) => any
-    ): any;
+      mode?: number | string
+    ): Promise<FileDescriptor>;
+    open(
+      path: string,
+      flag: number | string,
+      mode: number | string,
+      callback: (fd: FileDescriptor) => void
+    ): void;
     /**
      * Closes a file descriptor asynchronously
      * @example
@@ -9209,7 +9523,8 @@ declare module "fs" {
      * @param callback - if not provided, this function will return Promise object
      * @returns 0 if succeeded, otherwise throws an Error
      */
-    close(fd: number, callback: (...params: any[]) => any): number;
+    close(fd: FileDescriptor): Promise<0> | never;
+    close(fd: FileDescriptor, callback: (exitCode: 0) => void): void | never;
     /**
      * Reads data in chunks from the file it refers to the file descriptor
      * @example
@@ -9235,16 +9550,23 @@ declare module "fs" {
      * if the value is greater than or equal to 0, it specifies a file position to read from.
      * after the bytes are read, a current file position stayed the same
      * @param callback - if not provided, this function will return Promise object
-     * @returns { bytesRead: number, buffer: ArrayBuffer }
+     * @returns `Promise<Object>` - { bytesRead: number, buffer: ArrayBuffer }
      */
     read(
       fd: number,
       buffer: ArrayBuffer,
       offset: number,
       length: number,
+      position: number
+    ): Promise<{ bytesRead: number; buffer: ArrayBuffer }>;
+    read(
+      fd: number,
+      buffer: ArrayBuffer,
+      offset: number,
+      length: number,
       position: number,
-      callback: (...params: any[]) => any
-    ): Promise<object>;
+      callback: (bytesRead: number, buffer: ArrayBuffer) => void
+    ): void;
     /**
      * Writes data in chunks to the file it refers to the file descriptor
      * @example
@@ -9266,16 +9588,23 @@ declare module "fs" {
      * if the value is greater than or equal to 0, it specifies a file position to write from.
      * After writing, it will not change the file position
      * @param callback - if not provided, this function will return Promise object
-     * @returns { bytesWritten, buffer }
+     * @returns `Promise<Object>` - { bytesWritten: number, buffer: ArrayBuffer }
      */
     write(
       fd: number,
       buffer: ArrayBuffer,
       offset: number,
       length: number,
+      position: number
+    ): Promise<{ bytesWritten: number; buffer: ArrayBuffer }> | never;
+    write(
+      fd: number,
+      buffer: ArrayBuffer,
+      offset: number,
+      length: number,
       position: number,
-      callback: (...params: any[]) => any
-    ): Promise<object>;
+      callback: (bytesWritten: number, buffer: ArrayBuffer) => void
+    ): void;
     /**
      * Gets information asynchronously from a file or a folder of the path
      * @example
@@ -9286,7 +9615,8 @@ declare module "fs" {
      * @returns `Promise<Object>` - see [Stats]{@link https://nodejs.org/api/fs.html#class-fsstats} class in Node.js
      * Note: Some methods or properties may not be supportive for the return object due to the platform limitation
      */
-    lstat(path: string, callback: (...params: any[]) => any): any;
+    lstat(path: string): Promise<Stats>;
+    lstat(path: string, callback: (err: Error, stats: Stats) => void): void;
     /**
      * Gets information synchronously from a file or a folder of the path
      * @example
@@ -9296,7 +9626,7 @@ declare module "fs" {
      * @returns see [Stats]{@link https://nodejs.org/api/fs.html#class-fsstats} class in Node.js
      * Note: Some methods or properties may not be supportive for the return object due to the platform limitation
      */
-    lstatSync(path: string): any;
+    lstatSync(path: string): Stats;
     /**
      * Renames or moves, if required, the file from the oldPath to the newPath
      * @example
@@ -9306,11 +9636,12 @@ declare module "fs" {
      * @param callback - if not provided, this function will return Promise object
      * @returns `Promise<number>` - 0 if succeeded, otherwise throws an Error
      */
+    rename(oldPath: string, newPath: string): Promise<number>;
     rename(
       oldPath: string,
       newPath: string,
-      callback: (...params: any[]) => any
-    ): any;
+      callback: (exitCode: 0) => void
+    ): void;
     /**
      * Copies a file or a folder from the source path to the destination path
      * @example
@@ -9324,9 +9655,14 @@ declare module "fs" {
     copyFile(
       srcPath: string,
       destPath: string,
-      flags: number,
-      callback: (...params: any[]) => any
-    ): any;
+      flags?: number
+    ): Promise<0> | never;
+    copyFile(
+      srcPath: string,
+      destPath: string,
+      flags?: number,
+      callback: (exitCode: 0) => void
+    ): void | never;
     /**
      * Deletes a name with the file it refers to asynchronously
      * @example
@@ -9335,7 +9671,8 @@ declare module "fs" {
      * @param callback - if not provided, this function will return Promise object
      * @returns `Promise<number>` - 0 if succeeded, otherwise throws an Error
      */
-    unlink(path: string, callback: (...params: any[]) => any): any;
+    unlink(path: string): Promise<0> | never;
+    unlink(path: string, callback: (exitCode: 0) => void): void | never;
     /**
      * Creates a directory of the path asynchronously
      * @example
@@ -9349,9 +9686,15 @@ declare module "fs" {
       path: string,
       options: {
         recursive?: boolean;
+      }
+    ): Promise<0> | never;
+    mkdir(
+      path: string,
+      options: {
+        recursive?: boolean;
       },
-      callback: (...params: any[]) => any
-    ): any;
+      callback: (exitCode: 0) => void
+    ): void | never;
     /**
      * Removes a directory asynchronously
      * @example
@@ -9360,16 +9703,18 @@ declare module "fs" {
      * @param callback - if not provided, this function will return Promise object
      * @returns `Promise<number>` - 0 if succeeded, otherwise throws an Error
      */
-    rmdir(path: string, callback: (...params: any[]) => any): any;
+    rmdir(path: string): Promise<0> | never;
+    rmdir(path: string, callback: (exitCode: 0) => void): void;
     /**
      * Reads a directory to list the containing files and directories asynchronously
      * @example
      * const paths = await fs.readdir("plugin-data:/dirToRead");
      * @param path - path where to read the directory
      * @param callback - if not provided, this function will return Promise object
-     * @returns `Promise<Array<string>>` - string array of containing files and directories in the path
+     * @returns `Promise<string[]>` - string array of containing files and directories in the path
      */
-    readdir(path: string, callback: (...params: any[]) => any): any;
+    readdir(path: string): Promise<string[]>;
+    readdir(path: string, callback: (list: string[]) => void): void;
     /**
      * Reads a directory to list the containing files and directories synchronously
      * @example
@@ -9407,7 +9752,7 @@ declare module "os" {
      * "ARM based architecture" or "X86 based architecture" is returned as a 'model' value on UWP.
      * 0 is returned as a 'speed' value on UWP.
      */
-    public cpus(): any[];
+    public cpus(): { model: string; speed: number }[];
     /**
      * Gets the total amount of system memory in bytes
      * @returns the total amount of system memory in bytes as an integer
@@ -9596,25 +9941,25 @@ declare module "uxp" {
         create: (...params: any[]) => any;
         destroy: (...params: any[]) => any;
       };
-      panels: {
-        create: (...params: any[]) => any;
-        show: (...params: any[]) => any;
-        hide: (...params: any[]) => any;
-        destroy: (...params: any[]) => any;
-        invokeMenu: (...params: any[]) => any;
-        customEntrypoint: (...params: any[]) => any;
-        menuItems: {
-          id: string;
-          label: string;
-          enabled: boolean;
-          checked: boolean;
-          submenu: any[];
-        };
-      }[];
-      commands: {
-        run: (...params: any[]) => any;
-        cancel: (...params: any[]) => any;
-      }[];
+      panels: Record<
+        string,
+        {
+          create: (rootNode: any) => void;
+          show: (rootNode: any, data: any) => void;
+          hide?: (rootNode: any, data: any) => void;
+          destroy: (rootNode: any) => void;
+          invokeMenu: (menuId: string) => void;
+          update?: (selection: any, root: any) => void;
+          menuItems: (UxpMenuItem | string)[];
+        }
+      >;
+      commands: Record<
+        string,
+        {
+          run: (...params: any[]) => any;
+          cancel: (...params: any[]) => any;
+        }
+      >;
     }): void;
     /**
      * Get panel with specified id
@@ -9631,6 +9976,7 @@ declare module "uxp" {
      */
     getCommand(id: string): UxpCommandInfo;
   }
+
   export const entrypoints: EntryPoints;
 }
 declare module "uxp" {
@@ -9642,7 +9988,7 @@ declare module "uxp" {
     /**
      * To get the current list of plugins in Plugin Manager.
      */
-    plugins: any;
+    plugins: Set<UxpPluginInfo>;
   }
   export const pluginManager: PluginManager;
 }
@@ -9668,65 +10014,68 @@ declare module "uxp" {
   export const script: Script;
 }
 declare module "uxp" {
-  /**
-   * SecureStorage provides a protected storage which can be used to store sensitive data
-   * per plugin. SecureStorage takes a key-value pair and encrypts the value before being
-   * stored. After encryption, it stores the key and the encrypted value pair. When the value
-   * is requested with an associated key, it's retrieved after being decrypted. Please note
-   * that the key is not encrypted thus it's not protected by the cryptographic operation.
-   *
-   * Caveats for SecureStorage are as follows:
-   * 1. SecureStorage is not an appropriate storage for sensitive data which wants to keep
-   * secret from the current user. SecureStorage is protected under the current user's
-   * account credential. It means the encrypted data can be at risk of being decrypted
-   * with the current user's privilege.
-   * 2. Data in SecureStorage can be lost for various reasons. For an example, the user
-   * could uninstall the host application and delete the secure storage. Or, the cryptographic
-   * information used by the secure storage could be damaged by the user accidentally, and
-   * it will result in loss of data without the secure storage being removed. SecureStorage
-   * should be regarded as a cache rather than a persistent storage. Data in SecureStorage
-   * should be able to be regenerated from plugins after the time of loss.
-   */
-  class SecureStorage {
+  export namespace storage {
     /**
-     * Stores a key and value pair after the value is encrypted in a secure storage.
-     * @param key - Key to set value
-     * @param value - Value for a key.
-     * @returns `Promise<void>` Promise that resolves when the value is stored, rejected when the value is empty or not stored.
+     * SecureStorage provides a protected storage which can be used to store sensitive data
+     * per plugin. SecureStorage takes a key-value pair and encrypts the value before being
+     * stored. After encryption, it stores the key and the encrypted value pair. When the value
+     * is requested with an associated key, it's retrieved after being decrypted. Please note
+     * that the key is not encrypted thus it's not protected by the cryptographic operation.
+     *
+     * Caveats for SecureStorage are as follows:
+     * 1. SecureStorage is not an appropriate storage for sensitive data which wants to keep
+     * secret from the current user. SecureStorage is protected under the current user's
+     * account credential. It means the encrypted data can be at risk of being decrypted
+     * with the current user's privilege.
+     * 2. Data in SecureStorage can be lost for various reasons. For an example, the user
+     * could uninstall the host application and delete the secure storage. Or, the cryptographic
+     * information used by the secure storage could be damaged by the user accidentally, and
+     * it will result in loss of data without the secure storage being removed. SecureStorage
+     * should be regarded as a cache rather than a persistent storage. Data in SecureStorage
+     * should be able to be regenerated from plugins after the time of loss.
      */
-    setItem(
-      key: string,
-      value: string | ArrayBuffer | TypedArray
-    ): Promise<void>;
-    /**
-     * Retrieves a value associated with a provided key after the value is being decrypted from a secure storage.
-     * @param key - Key to get value
-     * @returns `Promise<Uint8Array>` Promise that resolves with an Uint8Array
-     */
-    getItem(key: string): Promise<Uint8Array>;
-    /**
-     * Removes a value associated with a provided key.
-     * @param key - Key to remove value
-     * @returns `Promise<void>` Promise that resolves when the value associated with the key is removed, rejected when the value is neither removed nor found.
-     */
-    removeItem(key: string): Promise<void>;
-    /**
-     * Returns a key which is stored at the given index.
-     * @param index - Integer representing the number of the key
-     * @returns Key which is stored at the given index.
-     */
-    key(index: number): number;
-    /**
-     * Number of items stored in the secure storage.
-     */
-    readonly length: number;
-    /**
-     * Clear all values in a secure storage.
-     * @returns `Promise<void>` Promise that resolves when all the items are cleared. rejected when there is no item to clear or clear failed.
-     */
-    clear(): Promise<void>;
+    export class SecureStorage {
+      /**
+       * Number of items stored in the secure storage.
+       */
+      readonly length: number;
+      /**
+       * Stores a key and value pair after the value is encrypted in a secure storage.
+       * @param key - Key to set value
+       * @param value - Value for a key.
+       * @returns `Promise<void>` Promise that resolves when the value is stored, rejected when the value is empty or not stored.
+       */
+      setItem(
+        key: string,
+        value: string | ArrayBuffer | TypedArray
+      ): Promise<void>;
+      /**
+       * Retrieves a value associated with a provided key after the value is being decrypted from a secure storage.
+       * @param key - Key to get value
+       * @returns `Promise<Uint8Array>` Promise that resolves with an Uint8Array
+       */
+      getItem(key: string): Promise<Uint8Array>;
+      /**
+       * Removes a value associated with a provided key.
+       * @param key - Key to remove value
+       * @returns `Promise<void>` Promise that resolves when the value associated with the key is removed, rejected when the value is neither removed nor found.
+       */
+      removeItem(key: string): Promise<void>;
+      /**
+       * Returns a key which is stored at the given index.
+       * @param index - Integer representing the number of the key
+       * @returns Key which is stored at the given index.
+       */
+      key(index: number): number;
+      /**
+       * Clear all values in a secure storage.
+       * @returns `Promise<void>` Promise that resolves when all the items are cleared, rejected when there is no item to clear or clear failed.
+       */
+      clear(): Promise<void>;
+    }
+
+    export const secureStorage: SecureStorage;
   }
-  export const secureStorage: SecureStorage;
 }
 declare module "uxp" {
   /**
@@ -9736,11 +10085,11 @@ declare module "uxp" {
     /**
      * Returns the version of UXP. For example, uxp-6.0.0
      */
-    uxp: any;
+    uxp: string;
     /**
      * Returns the version of the plugin. This matches the version as specified in your plugin's manifest.
      */
-    plugin: any;
+    plugin: string;
   }
   export const versions: Versions;
 }
@@ -9750,9 +10099,18 @@ declare module "uxp" {
    * `require("uxp").host`
    */
   class Host {
-    name: any;
-    version: any;
-    uiLocale: any;
+    /**
+     * The name of the host application. For ex, returns "photoshop" for Photoshop.
+     */
+    name: string;
+    /**
+     * The version of host application. For ex, "20.0.0".
+     */
+    version: string;
+    /**
+     * 5 letter UI locale of host application. For ex, "en_US".
+     */
+    uiLocale: string;
   }
   export const host: Host;
 }
@@ -11226,7 +11584,7 @@ declare module "uxp" {
      * let userId = require('uxp').userInfo.userId(); // Get the GUID of plugin user
      * console.log(userId()); // e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
      */
-    userId(): void;
+    userId(): string;
   }
   export const userInfo: UserInfo;
 }
