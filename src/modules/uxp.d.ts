@@ -474,7 +474,7 @@ declare module "uxp" {
        * @param [options.initialDomain] - the preferred initial location of the file picker. If not defined, the most recently used domain from a file picker is used instead.
        * @returns `Promise<Folder | null>` - the selected folder or `null` if no folder is selected.
        */
-      getFolder(options: { initialDomain?: symbol }): Promise<Folder | null>;
+      getFolder(options?: { initialDomain?: symbol }): Promise<Folder | null>;
       /**
        * Returns a temporary folder. The contents of the folder will be removed when
        * the extension is disposed.
