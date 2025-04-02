@@ -157,7 +157,7 @@ interface Clipboard {
 declare var Clipboard: {
     prototype: Clipboard;
     new (): Clipboard;
-}
+};
 
 interface NavigatorLanguage {
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator/language) */
@@ -293,7 +293,7 @@ declare function fetch(
         headers?: Headers;
         body?: string | ArrayBuffer | TypedArray | Blob | FormData | ReadableStream | URLSearchParams;
         credentials?: RequestCredentials;
-    }
+    },
 ): Promise<Response>;
 
 /**
@@ -326,7 +326,7 @@ interface FormData {
 
 declare var FormData: {
     prototype: FormData;
-    new(): FormData
+    new (): FormData;
     // new (form?: HTMLFormElement, submitter?: HTMLElement | null): FormData;
 };
 
@@ -513,7 +513,7 @@ declare var Request: {
     prototype: Request;
     new (
         input: RequestInfo, // | URL,
-        init?: RequestInit
+        init?: RequestInit,
     ): Request;
 };
 
@@ -558,7 +558,7 @@ declare var Response: {
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/redirect_static) */
     redirect(
         url: string, // URL
-        status?: number
+        status?: number,
     ): Response;
 };
 
@@ -656,7 +656,7 @@ declare var WebSocket: {
     prototype: WebSocket;
     new (
         url: string, // | URL, NOTE: Non-standard API as URL is not supported
-        protocols?: string | string[]
+        protocols?: string | string[],
     ): WebSocket;
     readonly CONNECTING: 0;
     readonly OPEN: 1;

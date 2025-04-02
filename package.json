@@ -1,6 +1,6 @@
 {
   "name": "@adobe/cc-ext-uxp-types",
-  "version": "8.1.1-tadjh.1",
+  "version": "8.1.2-tadjh.1",
   "license": "Apache-2.0",
   "description": "Typescript definitions for the Adobe UXP JS API",
   "main": "src/index.d.ts",
@@ -20,6 +20,7 @@
   ],
   "homepage": "https://github.com/adobe/cc-ext-uxp-types#readme",
   "devDependencies": {
+    "prettier": "^3.5.3",
     "typescript": "^5.8.2"
   }
 }

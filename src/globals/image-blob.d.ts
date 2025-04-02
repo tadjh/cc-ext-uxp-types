@@ -106,52 +106,52 @@
  * @param options.colorProfile - `[Optional]` - The color profile (or mode) for the image data. This could be be "Adobe RGB (1998)"
  */
 declare class ImageBlob extends Blob {
-  constructor(
-    arrayBuffer: ArrayBuffer,
-    options: {
-      type: string;
-      width: number;
-      height: number;
-      colorSpace: string;
-      hasAlpha: boolean;
-      components: number;
-      componentSize: number;
-      pixelFormat: string;
-      colorProfile: string;
-    }
-  );
-  /**
-   * Size of the Blob in bytes.
-   */
-  readonly size: number;
-  /**
-   * MIME type of the Blob.
-   */
-  readonly type: string;
-  /**
-   * Get the contents of the Blob in the form of an ArrayBuffer.
-   * @returns `Promise<ArrayBuffer>` Promise that resolves with an ArrayBuffer that contains the blob's data in binary form.
-   */
-  arrayBuffer(): Promise<ArrayBuffer>;
-  /**
-   * Get a portion of the Blob's data selected from start to end (end not included).
-   * @param [start = 0] - `(Optional)` Index into the Blob indicating the first byte to include in the new Blob
-   * @param [end = size] - `(Optional)` Index into the Blob indicating the first byte that will NOT be included in the new Blob
-   * @param [contentType = ""] - `(Optional)` String containing the file's {@link https://developer.mozilla.org/en-US/docs/Glossary/MIME_type | MIME type},
-   * or empty string if the type could not be determined. Refer {@link https://developer.mozilla.org/en-US/docs/Web/API/Blob/type#value | UxpBlob.type}
-   * @returns New Blob object containing the specified subset of the data contained with the blob on which this method was called.
-   * The original blob is not altered.
-   */
-  slice(start?: number, end?: number, contentType?: string): Blob;
-  /**
-   * Get the data contained within the Blob as a ReadableStream.
-   * @returns Content of the Blob.
-   */
-  stream(): ReadableStream;
-  /**
-   * Get contents of the Blob as a string.
-   * @returns `Promise<string>` Promise that resolves with a string which contains the blob's data as a text string.
-   * The data is always presumed to be in UTF-8 format.
-   */
-  text(): Promise<string>; // Updated return type to Promise<string>
+    constructor(
+        arrayBuffer: ArrayBuffer,
+        options: {
+            type: string;
+            width: number;
+            height: number;
+            colorSpace: string;
+            hasAlpha: boolean;
+            components: number;
+            componentSize: number;
+            pixelFormat: string;
+            colorProfile: string;
+        },
+    );
+    /**
+     * Size of the Blob in bytes.
+     */
+    readonly size: number;
+    /**
+     * MIME type of the Blob.
+     */
+    readonly type: string;
+    /**
+     * Get the contents of the Blob in the form of an ArrayBuffer.
+     * @returns `Promise<ArrayBuffer>` Promise that resolves with an ArrayBuffer that contains the blob's data in binary form.
+     */
+    arrayBuffer(): Promise<ArrayBuffer>;
+    /**
+     * Get a portion of the Blob's data selected from start to end (end not included).
+     * @param [start = 0] - `(Optional)` Index into the Blob indicating the first byte to include in the new Blob
+     * @param [end = size] - `(Optional)` Index into the Blob indicating the first byte that will NOT be included in the new Blob
+     * @param [contentType = ""] - `(Optional)` String containing the file's {@link https://developer.mozilla.org/en-US/docs/Glossary/MIME_type | MIME type},
+     * or empty string if the type could not be determined. Refer {@link https://developer.mozilla.org/en-US/docs/Web/API/Blob/type#value | UxpBlob.type}
+     * @returns New Blob object containing the specified subset of the data contained with the blob on which this method was called.
+     * The original blob is not altered.
+     */
+    slice(start?: number, end?: number, contentType?: string): Blob;
+    /**
+     * Get the data contained within the Blob as a ReadableStream.
+     * @returns Content of the Blob.
+     */
+    stream(): ReadableStream;
+    /**
+     * Get contents of the Blob as a string.
+     * @returns `Promise<string>` Promise that resolves with a string which contains the blob's data as a text string.
+     * The data is always presumed to be in UTF-8 format.
+     */
+    text(): Promise<string>; // Updated return type to Promise<string>
 }

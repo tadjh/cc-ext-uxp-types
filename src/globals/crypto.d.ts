@@ -30,13 +30,6 @@ declare class Crypto {
  * Integer-based TypedArray, that is one of Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, BigInt64Array, BigUint64Array
  * but not Float32Array nor Float64Array
  */
-declare type IntegerArray =
-    | Int8Array
-    | Uint8Array
-    | Uint8ClampedArray
-    | Int16Array
-    | Uint16Array
-    | Int32Array
-    | Uint32Array;
+declare type IntegerArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array;
 // | BigInt64Array // Questionable support in UXP ES2015
 // | BigUint64Array; // Questionable support in UXP ES2015
