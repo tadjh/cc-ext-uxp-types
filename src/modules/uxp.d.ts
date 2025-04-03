@@ -320,7 +320,7 @@ declare module "uxp" {
          * console.log(file.isFile); // returns true
          * ```
          */
-        export class File {
+        export class File extends Entry {
             /**
              * Indicates that this instance is a file.
              * @example
