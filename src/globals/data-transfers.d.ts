@@ -286,15 +286,7 @@ declare var navigator: Navigator;
  * </ul>
  * @returns `Promise<Response>` Promise that resolves to a Response object.
  */
-declare function fetch(
-    input: string | Request,
-    init?: {
-        method?: string;
-        headers?: Headers;
-        body?: string | ArrayBuffer | TypedArray | Blob | FormData | ReadableStream | URLSearchParams;
-        credentials?: RequestCredentials;
-    },
-): Promise<Response>;
+declare function fetch(input: string | Request, init?: RequestInit): Promise<Response>;
 
 /**
  * Provides a way to easily construct a set of key/value pairs representing form fields and their values, which can then be easily sent using the XMLHttpRequest.send() method. It uses the same format a form would use if the encoding type were set to "multipart/form-data".
