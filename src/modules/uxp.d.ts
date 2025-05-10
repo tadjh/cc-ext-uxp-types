@@ -979,10 +979,12 @@ declare module "uxp" {
             | {
                   enableSWCSupport?: boolean;
                   enableFillAsCustomAttribute?: boolean;
+                  enableAlerts?: boolean;
               }
             | {
                   enableSWCSupport: never;
                   enableFillAsCustomAttribute?: boolean;
+                  enableAlerts?: boolean;
                   CSSNextSupport?: boolean | ("boxShadow" | "transformFunctions" | "transformProperties")[];
               };
     }
